@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TRACE RESULT</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#04070a;
+  --green:#22ff9c;
+  --green-soft:#5affb9;
+  --cyan:#38e8ff;
+  --pink:#ff3d81;
+  --muted:#4a6b60;
+  --line:rgba(34,255,156,0.14);
+  --text:#c8ffe4;
+}
+
+*{ margin:0; padding:0; box-sizing:border-box; }
+html{ background:var(--bg); }
+
+body{
+  background:
+    radial-gradient(1200px 700px at 50% -5%, rgba(34,255,156,0.08), transparent 60%),
+    radial-gradient(900px 600px at 100% 100%, rgba(56,232,255,0.06), transparent 55%),
+    var(--bg);
+  color:var(--green);
+  font-family:'JetBrains Mono', monospace;
+  min-height:100vh;
+  padding:20px 16px 40px;
+  -webkit-font-smoothing:antialiased;
+  position:relative;
+}
+body::before{
+  content:'';
+  position:fixed; inset:0;
+  background-image:
+    linear-gradient(rgba(34,255,156,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34,255,156,0.03) 1px, transparent 1px);
+  background-size:48px 48px;
+  pointer-events:none; z-index:0;
+}
+
+.wrap{ position:relative; z-index:2; max-width:960px; margin:0 auto; }
+
+.header{
+  text-align:center;
+  padding:26px 12px 22px;
+  margin-bottom:22px;
+}
+.sys-tag{
+  font-size:10px; letter-spacing:4px;
+  color:var(--muted); margin-bottom:12px; text-transform:uppercase;
+}
+h1{
+  font-family:'Space Grotesk', sans-serif;
+  font-size:clamp(26px,7vw,48px);
+  font-weight:700; letter-spacing:2px;
+  color:#eafff4;
+  text-shadow:0 0 26px rgba(34,255,156,0.5);
+}
+
+.badge-row{
+  display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:18px;
+}
+.badge{
+  font-family:'Space Grotesk', sans-serif;
+  font-size:10px; letter-spacing:2px; font-weight:600;
+  padding:7px 15px; border-radius:99px;
+  border:1px solid rgba(34,255,156,0.35);
+  color:var(--green-soft);
+  background:rgba(34,255,156,0.05);
+  backdrop-filter:blur(8px);
+  display:inline-flex; align-items:center;
+  text-transform:uppercase;
+}
+.badge-c{
+  border-color:rgba(56,232,255,0.4);
+  color:var(--cyan);
+  background:rgba(56,232,255,0.05);
+}
+.dot{
+  display:inline-block; width:6px; height:6px; border-radius:50%;
+  background:var(--green); margin-right:7px;
+  box-shadow:0 0 8px var(--green);
+  animation:blink 1.2s step-end infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+
+.stats{
+  display:grid; grid-template-columns:repeat(4,1fr);
+  gap:12px; margin-bottom:20px;
+}
+.sbox{
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:16px 10px; text-align:center;
+  background:linear-gradient(180deg, rgba(20,34,30,0.55), rgba(8,14,13,0.6));
+  backdrop-filter:blur(12px);
+  transition:transform .25s, box-shadow .25s;
+}
+.sbox:hover{ transform:translateY(-3px); box-shadow:0 12px 30px -12px rgba(34,255,156,0.4); }
+.snum{
+  font-family:'Space Grotesk', sans-serif;
+  font-size:24px; font-weight:700; display:block;
+  text-shadow:0 0 12px currentColor;
+}
+.slbl{ font-size:9px; letter-spacing:2px; color:var(--muted); margin-top:6px; text-transform:uppercase; }
+
+.grid{
+  display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;
+}
+
+.panel{
+  border:1px solid var(--line);
+  border-radius:16px;
+  background:linear-gradient(180deg, rgba(20,34,30,0.55), rgba(8,14,13,0.62));
+  backdrop-filter:blur(14px) saturate(140%);
+  box-shadow:0 0 0 1px rgba(255,255,255,0.02) inset, 0 20px 50px -24px rgba(0,0,0,0.8);
+  overflow:hidden; position:relative;
+}
+.panel-head{
+  padding:13px 16px;
+  border-bottom:1px solid var(--line);
+  background:rgba(34,255,156,0.04);
+  font-family:'Space Grotesk', sans-serif;
+  font-size:11px; letter-spacing:2px; font-weight:600;
+  color:var(--green-soft);
+  display:flex; align-items:center; justify-content:space-between;
+  text-transform:uppercase;
+}
+.dots span{
+  display:inline-block; width:7px; height:7px; border-radius:50%;
+  background:var(--green); margin-left:5px; opacity:0.35; box-shadow:0 0 6px var(--green);
+}
+.dots span:first-child{ opacity:0.95; animation:blink 1.5s infinite; }
+
+.panel-body{ padding:16px; }
+
+.prog-lbl{ font-size:10px; color:var(--muted); letter-spacing:2px; margin-bottom:7px; text-transform:uppercase; }
+.prog-bar{ height:4px; border-radius:99px; background:rgba(34,255,156,0.1); margin-bottom:14px; overflow:hidden; }
+.prog-fill{
+  height:100%; border-radius:99px;
+  background:linear-gradient(90deg,var(--cyan),var(--green));
+  box-shadow:0 0 10px var(--green);
+  width:0%; transition:width 1.5s ease-out;
+}
+
+#terminal{
+  font-size:12px; line-height:1.95;
+  max-height:320px; overflow-y:auto; min-height:150px;
+}
+#terminal::-webkit-scrollbar{ width:4px; }
+#terminal::-webkit-scrollbar-thumb{ background:rgba(34,255,156,0.5); border-radius:99px; }
+
+.data-field{
+  margin:9px 0; padding:11px 14px;
+  border-left:2px solid var(--green);
+  border-radius:0 10px 10px 0;
+  background:rgba(34,255,156,0.04);
+  word-break:break-word;
+  transition:background .2s, transform .2s;
+}
+.data-field:hover{ background:rgba(34,255,156,0.09); transform:translateX(3px); }
+.data-field b{
+  display:block;
+  font-family:'Space Grotesk', sans-serif;
+  font-size:9px; letter-spacing:2px;
+  color:var(--cyan);
+  font-weight:600; margin-bottom:4px; text-transform:uppercase;
+}
+.data-field span{ color:var(--text); font-size:13.5px; }
+
+.record-header{
+  margin:18px 0 10px; padding:8px 12px; border-radius:8px;
+  font-family:'Space Grotesk', sans-serif;
+  font-size:10px; letter-spacing:2px; font-weight:600;
+  color:var(--pink);
+  border:1px solid rgba(255,61,129,0.35);
+  background:rgba(255,61,129,0.06);
+  text-transform:uppercase;
+}
+
+#mapBox{
+  grid-column:1 / -1;
+  border:1px solid rgba(56,232,255,0.28);
+  border-radius:16px;
+  background:linear-gradient(180deg, rgba(10,26,32,0.55), rgba(6,14,16,0.62));
+  backdrop-filter:blur(14px);
+  box-shadow:0 0 0 1px rgba(255,255,255,0.02) inset, 0 20px 50px -24px rgba(0,0,0,0.8);
+  overflow:hidden; position:relative;
+}
+.map-head{
+  padding:13px 16px;
+  border-bottom:1px solid rgba(56,232,255,0.16);
+  background:rgba(56,232,255,0.04);
+  font-family:'Space Grotesk', sans-serif;
+  font-size:11px; letter-spacing:2px; font-weight:600;
+  color:var(--cyan); text-transform:uppercase;
+}
+.map-body{ padding:14px; }
+#mapBox iframe{
+  display:block; width:100%; border:0; border-radius:12px;
+  filter:invert(92%) hue-rotate(135deg) saturate(1.3) brightness(0.85) contrast(1.05);
+}
+
+.footer{
+  text-align:center; margin-top:28px; padding-top:22px;
+  border-top:1px solid var(--line);
+}
+.footer p{ font-size:10px; color:var(--muted); letter-spacing:3px; margin-bottom:6px; }
+.credit{
+  font-family:'Space Grotesk', sans-serif;
+  font-size:11px; color:var(--cyan); letter-spacing:2px; margin-bottom:18px; font-weight:600;
+}
+.back-btn{
+  display:inline-block; padding:12px 26px;
+  border:none; border-radius:11px;
+  background:linear-gradient(180deg,var(--green),#12d47f);
+  color:#03130c;
+  font-family:'Space Grotesk', sans-serif;
+  font-size:11px; letter-spacing:2px; font-weight:700;
+  cursor:pointer; text-transform:uppercase;
+  box-shadow:0 10px 28px -10px rgba(34,255,156,0.6);
+  transition:transform .15s, box-shadow .25s, filter .25s;
+}
+.back-btn:hover{ box-shadow:0 14px 36px -10px rgba(34,255,156,0.8); filter:brightness(1.05); }
+.back-btn:active{ transform:scale(0.98); }
+
+@media(max-width:600px){
+  .grid{ grid-template-columns:1fr; }
+  .stats{ grid-template-columns:repeat(2,1fr); }
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="header">
+    <div class="sys-tag">Neural-Trace System v4.2 &middot; Classified Output</div>
+    <h1>TRACE RESULTS</h1>
+    <div class="badge-row">
+      <div class="badge"><span class="dot"></span>Live Session</div>
+      <div class="badge badge-c" id="statusBadge">Initializing...</div>
+      <div class="badge" id="clockBadge">--:--:--</div>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="sbox">
+      <span class="snum" id="s1" style="color:#22ff9c">00</span>
+      <div class="slbl">Fields Found</div>
+    </div>
+    <div class="sbox">
+      <span class="snum" id="s2" style="color:#38e8ff">0ms</span>
+      <div class="slbl">Query Time</div>
+    </div>
+    <div class="sbox">
+      <span class="snum" id="s3" style="color:#ff3d81">ENC</span>
+      <div class="slbl">Connection</div>
+    </div>
+    <div class="sbox">
+      <span class="snum" style="color:#22ff9c">99%</span>
+      <div class="slbl">Accuracy</div>
+    </div>
+  </div>
+
+  <div class="grid">
+
+    <div class="panel">
+      <div class="panel-head">
+        Trace_Log
+        <div class="dots"><span></span><span></span><span></span></div>
+      </div>
+      <div class="panel-body">
+        <div class="prog-lbl" id="progLbl">Standby</div>
+        <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
+        <div id="terminal"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        Extracted_Data
+        <div class="dots"><span></span><span></span><span></span></div>
+      </div>
+      <div class="panel-body">
+        <div id="dataDisplay"></div>
+      </div>
+    </div>
+
+    <div id="mapBox">
+      <div class="map-head">Geo_Location &middot; Live Ping</div>
+      <div class="map-body" id="mapInner">
+        <div style="color:#4a6b60;font-size:12px;padding:36px 0;text-align:center;letter-spacing:3px;">
+          AWAITING COORDINATE DATA...
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <p>EDUCATIONAL PURPOSE ONLY &mdash; NOT TO HARM ANYONE</p>
+    <div class="credit">[ CRAFTED BY SATYAM GUPTA ]</div>
+    <button class="back-btn" onclick="window.location.href='index.html'">&larr; Return To Base</button>
+  </div>
+</div>
+
+<audio id="successAudio" src="success.mp3"></audio>
+
+<script>
+
+/* ── CLOCK ── */
+setInterval(function(){
+  var n = new Date();
+  var t = [n.getHours(), n.getMinutes(), n.getSeconds()]
+    .map(function(v){ return String(v).padStart(2,'0'); }).join(':');
+  document.getElementById('clockBadge').textContent = t;
+}, 1000);
+
+/* ── UI HELPERS ── */
+function setProgress(pct, lbl){
+  document.getElementById('progFill').style.width = pct + '%';
+  document.getElementById('progLbl').textContent = lbl;
+}
+function setStatus(t){ document.getElementById('statusBadge').textContent = t; }
+
+function showMap(addr){
+  if(!addr) return;
+  document.getElementById('mapInner').innerHTML =
+    '<iframe width="100%" height="280" frameborder="0" scrolling="no"' +
+    ' src="https://maps.google.com/maps?q=' + encodeURIComponent(addr) + '&z=14&output=embed"></iframe>';
+}
+
+const params = new URLSearchParams(window.location.search);
+const num = params.get('num');
+
+const terminal = document.getElementById("terminal");
+const dataDisplay = document.getElementById("dataDisplay");
+
+function log(text){
+  const div = document.createElement("div");
+  div.textContent = "> " + text;
+  div.style.color = text.includes("\u2714") ? "#22ff9c" :
+                    text.includes("Error") || text.includes("API:") ? "#ff3d81" : "#38e8ff";
+  terminal.appendChild(div);
+  terminal.scrollTop = terminal.scrollHeight;
+}
+
+function addField(label, value){
+  const div = document.createElement("div");
+  div.className = "data-field";
+  div.innerHTML = "<b>" + label + "</b><span>" + (value || "N/A") + "</span>";
+  dataDisplay.appendChild(div);
+
+  const cur = parseInt(document.getElementById('s1').textContent) || 0;
+  document.getElementById('s1').textContent = String(cur + 1).padStart(2, '0');
+}
+
+function addRecordHeader(text){
+  const div = document.createElement("div");
+  div.className = "record-header";
+  div.textContent = text;
+  dataDisplay.appendChild(div);
+}
+
+function render(obj, prefix){
+  prefix = prefix || "";
+  if(Array.isArray(obj)){
+    obj.forEach(function(item, idx){
+      if(item !== null && typeof item === "object"){
+        render(item, prefix + "[" + idx + "] ");
+      } else {
+        addField((prefix + "[" + idx + "]").toUpperCase(), item);
+      }
+    });
+    return;
+  }
+  for(var key in obj){
+    if(!Object.prototype.hasOwnProperty.call(obj, key)) continue;
+    var value = obj[key];
+    if(value !== null && typeof value === "object"){
+      render(value, prefix + key + " \u2192 ");
+    } else {
+      addField((prefix + key).toUpperCase(), value);
+      if(key.toLowerCase().includes("address") && value){
+        showMap(value);
+      }
+    }
+  }
+}
+
+function showAllData(data){
+  dataDisplay.innerHTML = "";
+  document.getElementById('s1').textContent = '00';
+  if(Array.isArray(data)){
+    if(data.length === 0){ addField("RESULT", "No records found"); return; }
+    data.forEach(function(record, idx){
+      if(data.length > 1){ addRecordHeader("RECORD #" + (idx + 1) + " / " + data.length); }
+      render(record);
+    });
+  } else {
+    render(data);
+  }
+}
+
+async function start(){
+  if(!num){
+    log("No number provided");
+    log("Usage: ?num=XXXXXXXXXX");
+    setStatus("No Target");
+    setProgress(100, "Idle");
+    return;
+  }
+
+  setProgress(10, "Booting...");
+  log("Target: " + num);
+  setProgress(30, "Connecting...");
+  log("Connecting to server...");
+
+  var t0 = Date.now();
+
+  try{
+    
+    let baseUrl = localStorage.getItem("DYNAMIC_API_URL") || "";
+    try {
+        let confRes = await fetch("https://raw.githubusercontent.com/satyamgupta1287-coder/numberdetailfinder-apk/refs/heads/main/app_config.json?t=" + Date.now());
+        if (confRes.ok) {
+            let conf = await confRes.json();
+            if (conf.api_url) {
+                baseUrl = conf.api_url;
+                localStorage.setItem("DYNAMIC_API_URL", conf.api_url);
+            }
+        }
+    } catch(e) {
+        console.log("Config fetch in result failed:", e);
+    }
+    const res = await fetch(baseUrl + encodeURIComponent(num));
+
+    const json = await res.json();
+    console.log("API:", json);
+    log("Response received from server...");
+
+    document.getElementById('s2').textContent = (Date.now() - t0) + "ms";
+    document.getElementById('s3').textContent = "TLS";
+    setProgress(60, "Parsing...");
+
+    if(json.status === false){
+      log("API: " + json.message);
+      setStatus("API Error");
+      setProgress(100, "Error");
+      showAllData(json);
+      return;
+    }
+
+    setProgress(85, "Rendering...");
+    log("Data received \u2714");
+
+    showAllData(json);
+
+    setProgress(100, "Trace Complete \u2714");
+    log("Completed \u2714");
+    setStatus("Data Found \u2714");
+
+    try{
+      var a = document.getElementById('successAudio');
+      a.currentTime = 0;
+      a.play().catch(function(){});
+    }catch(e){}
+
+  }catch(e){
+    log("Error: " + e.message);
+    setStatus("Error");
+    setProgress(100, "Error");
+  }
+}
+
+start();
+
+</script>
+</body>
+</html>

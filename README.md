@@ -1,11 +1,15 @@
-<div align="center">
+# Cyber Trace X
 
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+A cyberpunk-themed elite phone number lookup system.
+This project has been rewritten from a web-based HTML application to a native Android application using Kotlin and Jetpack Compose.
 
-  <h1>Built with AI Studio</h2>
+## Features
+- Cyberpunk styled UI with Matrix-like scanning and grid background
+- Network API integration to query phone number details
+- Dynamic JSON field extraction and parsing
+- Map intent integration for Geo Location
+- Material 3 Compose Design
 
-  <p>The fastest path from prompt to production with Gemini.</p>
-
-  <a href="https://aistudio.google.com/apps">Start building</a>
-
-</div>
+## Build
+Uses Gradle Kotlin DSL.
+Build the app with: `./gradlew assembleDebug`

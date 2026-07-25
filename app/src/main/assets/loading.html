@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TRACE_SYS :: PROCESSING</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#04070a;
+  --green:#22ff9c;
+  --green-soft:#5affb9;
+  --cyan:#38e8ff;
+  --pink:#ff3d81;
+  --muted:#4a6b60;
+  --line:rgba(34,255,156,0.14);
+}
+
+*{ margin:0; padding:0; box-sizing:border-box; }
+html{ background:var(--bg); }
+
+body{
+  background:
+    radial-gradient(1100px 650px at 50% -10%, rgba(34,255,156,0.10), transparent 60%),
+    radial-gradient(800px 550px at 100% 110%, rgba(56,232,255,0.08), transparent 55%),
+    var(--bg);
+  color:var(--green);
+  font-family:'JetBrains Mono', monospace;
+  min-height:100vh; min-height:100dvh;
+  display:flex; flex-direction:column;
+  justify-content:center; align-items:center;
+  overflow:hidden; padding:24px 16px;
+  -webkit-font-smoothing:antialiased;
+}
+
+body::before{
+  content:'';
+  position:fixed; inset:0;
+  background-image:
+    linear-gradient(rgba(34,255,156,0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34,255,156,0.035) 1px, transparent 1px);
+  background-size:44px 44px;
+  mask-image:radial-gradient(ellipse at center, #000 30%, transparent 78%);
+  -webkit-mask-image:radial-gradient(ellipse at center, #000 30%, transparent 78%);
+  pointer-events:none; z-index:1;
+}
+body::after{
+  content:'';
+  position:fixed; inset:0;
+  background:radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,0.85) 100%);
+  pointer-events:none; z-index:1;
+}
+
+#mc{ position:fixed; inset:0; width:100%; height:100%; z-index:0; opacity:0.10; pointer-events:none; }
+
+/* ── PANEL ── */
+.panel{
+  position:relative; z-index:10;
+  width:100%; max-width:440px;
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:linear-gradient(180deg, rgba(20,34,30,0.65), rgba(8,14,13,0.72));
+  backdrop-filter:blur(18px) saturate(140%);
+  -webkit-backdrop-filter:blur(18px) saturate(140%);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.02) inset,
+    0 30px 80px -20px rgba(0,0,0,0.85),
+    0 0 60px -18px rgba(34,255,156,0.35);
+  overflow:hidden;
+  animation:boxIn 0.6s cubic-bezier(.2,.8,.2,1) both;
+}
+@keyframes boxIn{ from{opacity:0;transform:translateY(22px) scale(.98);} to{opacity:1;transform:translateY(0) scale(1);} }
+
+.edge{ position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,var(--green),transparent); opacity:0.7; }
+
+.scan-beam{
+  position:absolute; top:0; left:-40%; width:40%; height:100%;
+  background:linear-gradient(90deg,transparent,rgba(34,255,156,0.06),transparent);
+  animation:beam 4s ease-in-out infinite; z-index:1; pointer-events:none;
+}
+@keyframes beam{ 0%{left:-40%} 100%{left:120%} }
+
+.phead{
+  padding:14px 20px;
+  border-bottom:1px solid var(--line);
+  background:rgba(34,255,156,0.03);
+  display:flex; align-items:center; justify-content:space-between;
+  position:relative; z-index:2;
+}
+.phead-title{
+  font-family:'Space Grotesk', sans-serif;
+  font-size:11px; font-weight:600;
+  letter-spacing:2px; color:var(--green-soft);
+}
+.pdots span{
+  display:inline-block; width:8px; height:8px;
+  border-radius:50%; background:var(--green);
+  margin-left:6px; opacity:0.3; box-shadow:0 0 8px var(--green);
+}
+.pdots span:first-child{opacity:0.95;animation:blink 1s infinite;}
+.pdots span:nth-child(2){animation:blink 1s 0.33s infinite;}
+.pdots span:nth-child(3){animation:blink 1s 0.66s infinite;}
+@keyframes blink{0%,100%{opacity:0.95}50%{opacity:0.15}}
+
+.pbody{ padding:38px 30px 32px; text-align:center; position:relative; z-index:2; }
+
+.sys-tag{
+  font-size:10px; letter-spacing:4px;
+  color:var(--muted); margin-bottom:18px; text-transform:uppercase;
+}
+
+h1{
+  font-family:'Space Grotesk', sans-serif;
+  font-size:clamp(22px,6vw,34px);
+  font-weight:700; letter-spacing:2px;
+  color:#eafff4;
+  text-shadow:0 0 24px rgba(34,255,156,0.55);
+  margin-bottom:32px;
+}
+
+/* spinner */
+.spinner-wrap{ margin-bottom:32px; position:relative; display:inline-flex; }
+.ring{
+  width:88px; height:88px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center; position:relative;
+}
+.ring::before{
+  content:''; position:absolute; inset:0; border-radius:50%;
+  border:2px solid rgba(34,255,156,0.10);
+  border-top-color:var(--green);
+  box-shadow:0 0 20px -2px rgba(34,255,156,0.55);
+  animation:spin 0.9s linear infinite;
+}
+.ring::after{
+  content:''; position:absolute; inset:8px; border-radius:50%;
+  border:1px solid rgba(56,232,255,0.15);
+  border-bottom-color:var(--cyan);
+  box-shadow:0 0 14px -2px rgba(56,232,255,0.45);
+  animation:spin 1.4s linear infinite reverse;
+}
+.ring-glow{
+  position:absolute; inset:14px; border-radius:50%;
+  background:radial-gradient(circle, rgba(34,255,156,0.22), transparent 70%);
+  animation:iconPulse 1.6s ease-in-out infinite;
+}
+.ring-icon{ font-size:24px; z-index:1; color:var(--green-soft); animation:iconPulse 1.6s ease-in-out infinite; }
+@keyframes iconPulse{0%,100%{opacity:0.6;transform:scale(0.95);}50%{opacity:1;transform:scale(1.05);}}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+.status-txt{
+  font-family:'Space Grotesk', sans-serif;
+  font-size:12px; letter-spacing:2px;
+  color:var(--cyan); text-shadow:0 0 10px rgba(56,232,255,0.5);
+  margin-bottom:26px; min-height:20px; text-transform:uppercase;
+}
+
+.prog-lbl{
+  font-size:10px; letter-spacing:2px;
+  color:var(--muted); margin-bottom:10px;
+  display:flex; justify-content:space-between; text-transform:uppercase;
+}
+.prog-bar{
+  width:100%; height:6px; border-radius:99px;
+  background:rgba(34,255,156,0.10);
+  position:relative; overflow:hidden;
+}
+.prog-fill{
+  height:100%; border-radius:99px;
+  background:linear-gradient(90deg,var(--cyan),var(--green));
+  box-shadow:0 0 14px rgba(34,255,156,0.7);
+  width:0%; transition:width 0.2s ease-out; position:relative;
+}
+.prog-fill::after{
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.35),transparent);
+  animation:shimmer 1.4s linear infinite;
+}
+@keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+
+.prog-pct{
+  font-family:'Space Grotesk', sans-serif;
+  font-size:30px; font-weight:700;
+  color:#eafff4; text-shadow:0 0 18px rgba(34,255,156,0.6);
+  margin-top:16px; letter-spacing:1px;
+}
+
+.log-area{
+  margin-top:22px; text-align:left;
+  border-top:1px solid var(--line);
+  padding-top:16px;
+  max-height:120px; overflow:hidden;
+  font-size:11.5px; line-height:1.9;
+  color:var(--muted);
+}
+.log-line{ animation:fadeIn 0.3s ease-out both; }
+.log-line.active{ color:var(--green-soft); }
+.log-line.done{ color:var(--muted); }
+@keyframes fadeIn{from{opacity:0;transform:translateX(-6px);}to{opacity:1;transform:translateX(0);}}
+
+.footer{
+  position:relative; z-index:10; margin-top:22px;
+  font-size:10px; color:var(--muted);
+  letter-spacing:2px; text-align:center;
+}
+</style>
+</head>
+<body>
+
+<canvas id="mc"></canvas>
+
+<div class="panel">
+  <div class="edge"></div>
+  <div class="scan-beam"></div>
+
+  <div class="phead">
+    <div class="phead-title">TRACE_PROCESSING</div>
+    <div class="pdots"><span></span><span></span><span></span></div>
+  </div>
+
+  <div class="pbody">
+    <div class="sys-tag">Neural-Trace System v4.2 &middot; Active</div>
+    <h1>INITIALIZING</h1>
+
+    <div class="spinner-wrap">
+      <div class="ring">
+        <span class="ring-glow"></span>
+        <span class="ring-icon">&#9889;</span>
+      </div>
+    </div>
+
+    <div class="status-txt" id="statusTxt">Booting system...</div>
+
+    <div class="prog-lbl">
+      <span>Trace Progress</span>
+      <span id="pctLbl">0%</span>
+    </div>
+    <div class="prog-bar">
+      <div class="prog-fill" id="progFill"></div>
+    </div>
+    <div class="prog-pct" id="pctBig">0%</div>
+
+    <div class="log-area" id="logArea"></div>
+  </div>
+</div>
+
+<div class="footer">EDUCATIONAL PURPOSE ONLY</div>
+
+<script>
+/* matrix */
+var mc=document.getElementById('mc'),ctx=mc.getContext('2d');
+function rsz(){mc.width=window.innerWidth;mc.height=window.innerHeight;}
+rsz(); window.addEventListener('resize',rsz);
+var ch='アイウエオ01001101TRACE',dp=[];
+function iDp(){dp=Array(Math.floor(mc.width/16)).fill(1);}
+iDp(); window.addEventListener('resize',iDp);
+setInterval(function(){
+  ctx.fillStyle='rgba(4,7,10,0.06)';ctx.fillRect(0,0,mc.width,mc.height);
+  ctx.font='14px monospace';
+  for(var i=0;i<dp.length;i++){
+    ctx.fillStyle=Math.random()>0.9?'#38e8ff':'#22ff9c';
+    ctx.globalAlpha=Math.random()*0.5+0.3;
+    ctx.fillText(ch[Math.floor(Math.random()*ch.length)],i*16,dp[i]*16);
+    if(dp[i]*16>mc.height&&Math.random()>0.975)dp[i]=0;
+    dp[i]++;
+  }
+  ctx.globalAlpha=1;
+},45);
+
+/* beep */
+var aC=new(window.AudioContext||window.webkitAudioContext)();
+function beep(f,d){
+  try{
+    var o=aC.createOscillator(),g=aC.createGain();
+    o.frequency.value=f; g.gain.value=0.035;
+    o.connect(g); g.connect(aC.destination);
+    o.start(); o.stop(aC.currentTime+d);
+  }catch(e){}
+}
+
+/* log */
+var logArea=document.getElementById('logArea');
+function addLog(txt, active){
+  var d=document.createElement('div');
+  d.className='log-line '+(active?'active':'done');
+  d.textContent='> '+txt;
+  logArea.appendChild(d);
+  logArea.scrollTop=logArea.scrollHeight;
+  var lines=logArea.querySelectorAll('.log-line.active');
+  for(var i=0;i<lines.length-1;i++) lines[i].className='log-line done';
+}
+
+/* params */
+var params=new URLSearchParams(window.location.search);
+var num=params.get('num');
+
+var pct=0;
+var stages=[
+  {pct:12,  status:'Booting neural interface...', log:'System boot sequence initiated'},
+  {pct:28,  status:'Validating target...',         log:'Target number: '+num},
+  {pct:45,  status:'Connecting to database...',    log:'Encrypted tunnel established'},
+  {pct:60,  status:'Querying records...',          log:'Querying distributed DB nodes'},
+  {pct:75,  status:'Decrypting data...',           log:'Decryption keys applied'},
+  {pct:88,  status:'Parsing response...',          log:'Parsing data fields'},
+  {pct:96,  status:'Geolocating target...',        log:'Pinging geolocation servers'},
+  {pct:100, status:'Trace complete',               log:'All fields extracted successfully'},
+];
+
+var si=0;
+var fill=document.getElementById('progFill');
+var pctLbl=document.getElementById('pctLbl');
+var pctBig=document.getElementById('pctBig');
+var statusTxt=document.getElementById('statusTxt');
+
+function runStage(){
+  if(si>=stages.length){
+    setTimeout(function(){
+      window.location.href='result.html?num='+encodeURIComponent(num);
+    }, 600);
+    return;
+  }
+
+  var s=stages[si];
+  si++;
+
+  var from=pct;
+  var to=s.pct;
+  var step=(to-from)/20;
+  var cur=from;
+  var tid=setInterval(function(){
+    cur+=step;
+    if(cur>=to){ cur=to; clearInterval(tid); }
+    fill.style.width=cur+'%';
+    pctLbl.textContent=Math.floor(cur)+'%';
+    pctBig.textContent=Math.floor(cur)+'%';
+    beep(300+cur*3, 0.04);
+  },18);
+  pct=to;
+
+  statusTxt.textContent=s.status;
+  addLog(s.log, true);
+
+  var delay = si===stages.length ? 1200 : 400+Math.random()*300;
+  setTimeout(runStage, delay);
+}
+
+setTimeout(function(){
+  addLog('NEURAL-TRACE SYSTEM ONLINE', true);
+  setTimeout(runStage, 400);
+}, 300);
+</script>
+</body>
+</html>
